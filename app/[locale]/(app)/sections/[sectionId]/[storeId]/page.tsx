@@ -1,0 +1,382 @@
+"use client";
+
+import * as React from "react";
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import useSWR, { mutate as globalMutate } from "swr";
+import {
+  Plus,
+  Package,
+  QrCode,
+  ImageIcon,
+  Store,
+  ExternalLink,
+  Trash2,
+} from "lucide-react";
+import { Link, useRouter } from "@/i18n/routing";
+import { createClient } from "@/lib/supabase/client";
+import { TopNav } from "@/components/TopNav";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { deleteStoreWithStorage } from "@/lib/supabase/delete-helpers";
+import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ProductForm } from "@/components/ProductForm";
+import { toast } from "sonner";
+
+interface ProductItem {
+  id: string;
+  name: string;
+  notes: string | null;
+  photo_url: string | null;
+  has_qr: boolean;
+  qr_data: string | null;
+  created_at: string;
+}
+
+interface HierarchyInfo {
+  sectionName: string;
+  storeName: string;
+}
+
+export default function StoreProductsPage() {
+  const tProducts = useTranslations("products");
+  const tStores = useTranslations("stores");
+  const tNav = useTranslations("nav");
+  const tCommon = useTranslations("common");
+
+  const params = useParams();
+  const locale = (params?.locale as string) || "en";
+  const sectionId = params?.sectionId as string;
+  const storeId = params?.storeId as string;
+
+  const router = useRouter();
+  const supabase = createClient();
+
+  const [isFormOpen, setIsFormOpen] = React.useState(false);
+
+  // Store deletion state
+  const [isDeleteStoreOpen, setIsDeleteStoreOpen] = React.useState(false);
+  const [isDeletingStore, setIsDeletingStore] = React.useState(false);
+
+  // Protected route check
+  React.useEffect(() => {
+    const verifySession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        router.replace("/login");
+      }
+    };
+    verifySession();
+  }, [router, supabase]);
+
+  // Fetch Section and Store names for Breadcrumbs
+  const fetchHierarchy = async (): Promise<HierarchyInfo> => {
+    const [secRes, storeRes] = await Promise.all([
+      supabase.from("sections").select("name").eq("id", sectionId).single(),
+      supabase.from("stores").select("name").eq("id", storeId).single(),
+    ]);
+
+    return {
+      sectionName: secRes.data?.name || "",
+      storeName: storeRes.data?.name || "",
+    };
+  };
+
+  const { data: hierarchy } = useSWR(
+    sectionId && storeId ? `hierarchy-${sectionId}-${storeId}` : null,
+    fetchHierarchy,
+    { revalidateOnFocus: true }
+  );
+
+  // Fetch Products in this Store
+  const fetchProducts = async (): Promise<ProductItem[]> => {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      throw new Error("UNAUTHORIZED");
+    }
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, name, notes, photo_url, has_qr, qr_data, created_at")
+      .eq("store_id", storeId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    return data || [];
+  };
+
+  const {
+    data: products,
+    error: productsError,
+    isLoading,
+    mutate,
+  } = useSWR(storeId ? `products-${storeId}` : null, fetchProducts, {
+    revalidateOnFocus: true,
+  });
+
+  // Handle unauthorized SWR error
+  React.useEffect(() => {
+    if (productsError?.message === "UNAUTHORIZED") {
+      router.replace("/login");
+    }
+  }, [productsError, router]);
+
+  const handleDeleteStore = async () => {
+    setIsDeletingStore(true);
+    try {
+      await deleteStoreWithStorage(supabase, storeId);
+      toast.success(tStores("deleteSuccess"));
+      globalMutate(`stores-${sectionId}`);
+      router.push(`/sections/${sectionId}`);
+    } catch {
+      toast.error(tStores("deleteError"), {
+        action: {
+          label: tCommon("retry"),
+          onClick: () => handleDeleteStore(),
+        },
+      });
+    } finally {
+      setIsDeletingStore(false);
+      setIsDeleteStoreOpen(false);
+    }
+  };
+
+  const totalProducts = products?.length || 0;
+
+  return (
+    <div className="min-h-screen bg-bg text-foreground">
+      <TopNav currentLocale={locale} />
+
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/sections">{tNav("sections")}</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href={`/sections/${sectionId}`}>
+                  {hierarchy?.sectionName ? (
+                    hierarchy.sectionName
+                  ) : (
+                    <Skeleton className="h-4 w-20 inline-block align-middle" />
+                  )}
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>
+                {hierarchy?.storeName ? (
+                  hierarchy.storeName
+                ) : (
+                  <Skeleton className="h-4 w-24 inline-block align-middle" />
+                )}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        {/* Store Products Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/40 pb-6">
+          <div className="space-y-1 text-start">
+            <div className="flex items-center gap-2">
+              <Store className="h-5 w-5 text-accent" />
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                {hierarchy?.storeName ? (
+                  hierarchy.storeName
+                ) : (
+                  <Skeleton className="h-7 w-48" />
+                )}
+              </h1>
+            </div>
+            <p className="text-xs text-muted max-w-2xl leading-relaxed">
+              {tProducts("subtitle")}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {hierarchy?.storeName && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsDeleteStoreOpen(true)}
+                className="text-red-600 hover:text-red-700 hover:bg-red-500/10 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-500/20 gap-1.5"
+                title={tStores("deleteStore")}
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+                <span>{tStores("deleteStore")}</span>
+              </Button>
+            )}
+
+            {products && products.length > 0 && (
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => setIsFormOpen(true)}
+                className="gap-2 shrink-0 font-medium"
+              >
+                <Plus className="h-4 w-4" />
+                {tProducts("addProduct")}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Content Body: Loading / Empty / Grid */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Card key={i} className="overflow-hidden border border-border bg-surface">
+                <Skeleton className="h-40 w-full rounded-none" />
+                <div className="p-4 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : products && products.length > 0 ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {products.map((product) => (
+              <Link
+                key={product.id}
+                href={`/product/${product.id}`}
+                className="group block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <Card className="h-full overflow-hidden transition-all duration-150 ease-out hover:border-accent hover:shadow-card hover:-translate-y-0.5 cursor-pointer flex flex-col">
+                  {/* Thumbnail Banner */}
+                  <div className="relative h-44 w-full bg-secondary/40 overflow-hidden flex items-center justify-center border-b border-border/40">
+                    {product.photo_url ? (
+                      <img
+                        src={product.photo_url}
+                        alt={product.name}
+                        className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-muted/60">
+                        <ImageIcon className="h-8 w-8 stroke-[1.5]" />
+                      </div>
+                    )}
+
+                    {/* QR Code Tag */}
+                    {product.has_qr && (
+                      <div className="absolute top-2.5 end-2.5 flex items-center gap-1 rounded-sm bg-surface/90 backdrop-blur-xs px-2 py-0.5 text-[10px] font-semibold text-accent shadow-soft border border-border/60">
+                        <QrCode className="h-3 w-3" />
+                        <span>{tProducts("hasQr")}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Details Body */}
+                  <div className="p-4 flex-1 flex flex-col justify-between space-y-2 text-start">
+                    <div>
+                      <h3 className="font-semibold text-sm text-foreground tracking-tight group-hover:text-accent transition-colors duration-150 line-clamp-1">
+                        {product.name}
+                      </h3>
+                      {product.notes && (
+                        <p className="text-xs text-muted mt-1 line-clamp-2 leading-relaxed">
+                          {product.notes}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between border-t border-border/30 text-[11px] text-muted">
+                      <span>
+                        {new Intl.DateTimeFormat(
+                          locale === "ar" ? "ar-SA" : "en-US",
+                          { month: "short", day: "numeric", year: "numeric" }
+                        ).format(new Date(product.created_at))}
+                      </span>
+                      <ExternalLink className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity rtl:-scale-x-100" />
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            icon={Package}
+            title={tProducts("emptyTitle")}
+            description={tProducts("emptyDescription")}
+            action={
+              <div className="flex flex-col items-center gap-2">
+                <Button
+                  variant="primary"
+                  onClick={() => setIsFormOpen(true)}
+                  className="h-14 w-14 rounded-full p-0 shadow-soft transition-transform duration-150 hover:scale-[1.03] active:scale-95"
+                  title={tProducts("addProduct")}
+                  aria-label={tProducts("addProduct")}
+                >
+                  <Plus className="h-6 w-6 stroke-[2.5]" />
+                </Button>
+                <span className="text-xs font-medium text-foreground">
+                  {tProducts("addProduct")}
+                </span>
+              </div>
+            }
+          />
+        )}
+      </main>
+
+      {/* Product Creation Modal (Linear style panel) */}
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto p-6 rounded-2xl">
+          <ProductForm
+            storeId={storeId}
+            onSuccess={() => {
+              setIsFormOpen(false);
+              mutate();
+            }}
+            onCancel={() => setIsFormOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Store Confirmation Dialog */}
+      {hierarchy && (
+        <DeleteConfirmDialog
+          open={isDeleteStoreOpen}
+          onOpenChange={(open) => {
+            if (!open && !isDeletingStore) {
+              setIsDeleteStoreOpen(false);
+            }
+          }}
+          title={tStores("deleteDialogTitle")}
+          body={tStores("deleteDialogBody", { name: hierarchy.storeName })}
+          confirmLabel={tStores("deleteStore")}
+          productCount={totalProducts}
+          productsWarning={tStores("deleteProductsWarning", { count: totalProducts })}
+          isDeleting={isDeletingStore}
+          onConfirm={handleDeleteStore}
+        />
+      )}
+    </div>
+  );
+}
