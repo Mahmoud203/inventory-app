@@ -26,12 +26,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { deleteStoreWithStorage } from "@/lib/supabase/delete-helpers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
-import { ProductForm } from "@/components/ProductForm";
+import { ProductFormModal } from "@/components/ProductFormModal";
 import { toast } from "sonner";
 
 interface ProductItem {
@@ -205,8 +204,8 @@ export default function StoreProductsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/40 pb-6">
           <div className="space-y-1 text-start">
             <div className="flex items-center gap-2">
-              <Store className="h-5 w-5 text-accent" />
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              <Store className="h-5 w-5 sm:h-6 sm:w-6 text-accent shrink-0" />
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
                 {hierarchy?.storeName ? (
                   hierarchy.storeName
                 ) : (
@@ -214,7 +213,7 @@ export default function StoreProductsPage() {
                 )}
               </h1>
             </div>
-            <p className="text-xs text-muted max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted max-w-2xl leading-relaxed">
               {tProducts("subtitle")}
             </p>
           </div>
@@ -226,7 +225,7 @@ export default function StoreProductsPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsDeleteStoreOpen(true)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-500/10 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-500/20 gap-1.5"
+                className="text-red-600 hover:text-red-700 hover:bg-red-500/10 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-500/20 gap-1.5 min-h-[44px] sm:min-h-0"
                 title={tStores("deleteStore")}
               >
                 <Trash2 className="h-4 w-4" strokeWidth={1.5} />
@@ -239,7 +238,7 @@ export default function StoreProductsPage() {
                 variant="primary"
                 size="md"
                 onClick={() => setIsFormOpen(true)}
-                className="gap-2 shrink-0 font-medium"
+                className="gap-2 shrink-0 font-medium w-full sm:w-auto justify-center"
               >
                 <Plus className="h-4 w-4" />
                 {tProducts("addProduct")}
@@ -248,13 +247,13 @@ export default function StoreProductsPage() {
           </div>
         </div>
 
-        {/* Content Body: Loading / Empty / Grid */}
+        {/* Content Body: Loading / Empty / Grid (2 cols mobile, 3 sm, 4 lg) */}
         {isLoading ? (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <Card key={i} className="overflow-hidden border border-border bg-surface">
-                <Skeleton className="h-40 w-full rounded-none" />
-                <div className="p-4 space-y-2">
+                <Skeleton className="h-32 sm:h-40 w-full rounded-none" />
+                <div className="p-3 sm:p-4 space-y-2">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-3 w-1/2" />
                 </div>
@@ -262,7 +261,7 @@ export default function StoreProductsPage() {
             ))}
           </div>
         ) : products && products.length > 0 ? (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-3 lg:grid-cols-4">
             {products.map((product) => (
               <Link
                 key={product.id}
@@ -271,7 +270,7 @@ export default function StoreProductsPage() {
               >
                 <Card className="h-full overflow-hidden transition-all duration-150 ease-out hover:border-accent hover:shadow-card hover:-translate-y-0.5 cursor-pointer flex flex-col">
                   {/* Thumbnail Banner */}
-                  <div className="relative h-44 w-full bg-secondary/40 overflow-hidden flex items-center justify-center border-b border-border/40">
+                  <div className="relative h-32 sm:h-44 w-full bg-secondary/40 overflow-hidden flex items-center justify-center border-b border-border/40">
                     {product.photo_url ? (
                       <img
                         src={product.photo_url}
@@ -280,23 +279,23 @@ export default function StoreProductsPage() {
                       />
                     ) : (
                       <div className="flex flex-col items-center justify-center text-muted/60">
-                        <ImageIcon className="h-8 w-8 stroke-[1.5]" />
+                        <ImageIcon className="h-7 w-7 sm:h-8 sm:w-8 stroke-[1.5]" />
                       </div>
                     )}
 
                     {/* QR Code Tag */}
                     {product.has_qr && (
-                      <div className="absolute top-2.5 end-2.5 flex items-center gap-1 rounded-sm bg-surface/90 backdrop-blur-xs px-2 py-0.5 text-[10px] font-semibold text-accent shadow-soft border border-border/60">
+                      <div className="absolute top-2 end-2 sm:top-2.5 sm:end-2.5 flex items-center gap-1 rounded-sm bg-surface/90 backdrop-blur-xs px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-semibold text-accent shadow-soft border border-border/60">
                         <QrCode className="h-3 w-3" />
-                        <span>{tProducts("hasQr")}</span>
+                        <span className="hidden xs:inline sm:inline">{tProducts("hasQr")}</span>
                       </div>
                     )}
                   </div>
 
                   {/* Details Body */}
-                  <div className="p-4 flex-1 flex flex-col justify-between space-y-2 text-start">
+                  <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between space-y-2 text-start">
                     <div>
-                      <h3 className="font-semibold text-sm text-foreground tracking-tight group-hover:text-accent transition-colors duration-150 line-clamp-1">
+                      <h3 className="font-semibold text-xs sm:text-sm text-foreground tracking-tight group-hover:text-accent transition-colors duration-150 truncate">
                         {product.name}
                       </h3>
                       {product.notes && (
@@ -306,7 +305,7 @@ export default function StoreProductsPage() {
                       )}
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between border-t border-border/30 text-[11px] text-muted">
+                    <div className="pt-2 flex items-center justify-between border-t border-border/30 text-[10px] sm:text-[11px] text-muted">
                       <span>
                         {new Intl.DateTimeFormat(
                           locale === "ar" ? "ar-SA" : "en-US",
@@ -330,11 +329,11 @@ export default function StoreProductsPage() {
                 <Button
                   variant="primary"
                   onClick={() => setIsFormOpen(true)}
-                  className="h-14 w-14 rounded-full p-0 shadow-soft transition-transform duration-150 hover:scale-[1.03] active:scale-95"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full p-0 shadow-soft transition-transform duration-150 hover:scale-[1.03] active:scale-95"
                   title={tProducts("addProduct")}
                   aria-label={tProducts("addProduct")}
                 >
-                  <Plus className="h-6 w-6 stroke-[2.5]" />
+                  <Plus className="h-6 w-6 sm:h-7 sm:w-7 stroke-[2.5]" />
                 </Button>
                 <span className="text-xs font-medium text-foreground">
                   {tProducts("addProduct")}
@@ -345,19 +344,17 @@ export default function StoreProductsPage() {
         )}
       </main>
 
-      {/* Product Creation Modal (Linear style panel) */}
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto p-6 rounded-2xl">
-          <ProductForm
-            storeId={storeId}
-            onSuccess={() => {
-              setIsFormOpen(false);
-              mutate();
-            }}
-            onCancel={() => setIsFormOpen(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Product Creation Modal (Full-screen Sheet on mobile, Dialog on desktop) */}
+      <ProductFormModal
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        storeId={storeId}
+        onSuccess={() => {
+          setIsFormOpen(false);
+          mutate();
+        }}
+        onCancel={() => setIsFormOpen(false)}
+      />
 
       {/* Delete Store Confirmation Dialog */}
       {hierarchy && (

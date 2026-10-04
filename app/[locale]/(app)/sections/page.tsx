@@ -119,10 +119,10 @@ export default function SectionsPage() {
       storeCount: Array.isArray(row.stores) ? row.stores.length : 0,
       productCount: Array.isArray(row.stores)
         ? row.stores.reduce(
-            (acc, st) =>
-              acc + (Array.isArray(st.products) ? st.products.length : 0),
-            0
-          )
+          (acc, st) =>
+            acc + (Array.isArray(st.products) ? st.products.length : 0),
+          0
+        )
         : 0,
     }));
   };
@@ -224,12 +224,12 @@ export default function SectionsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/40 pb-6">
           <div className="space-y-1 text-start">
             <div className="flex items-center gap-2">
-              <LayoutGrid className="h-5 w-5 text-accent" />
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              <LayoutGrid className="h-5 w-5 sm:h-6 sm:w-6 text-accent shrink-0" />
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
                 {t("title")}
               </h1>
             </div>
-            <p className="text-xs text-muted max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted max-w-2xl leading-relaxed">
               {t("subtitle")}
             </p>
           </div>
@@ -239,7 +239,7 @@ export default function SectionsPage() {
               variant="primary"
               size="md"
               onClick={() => setIsDialogOpen(true)}
-              className="gap-2 shrink-0 font-medium"
+              className="gap-2 shrink-0 font-medium w-full sm:w-auto justify-center"
             >
               <Plus className="h-4 w-4" />
               {t("addSection")}
@@ -251,7 +251,7 @@ export default function SectionsPage() {
         {isLoading ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i} className="h-28 p-6 flex flex-col justify-between shadow-soft">
+              <Card key={i} className="h-28 p-4 md:p-6 flex flex-col justify-between shadow-soft">
                 <div className="space-y-2">
                   <Skeleton className="h-5 w-3/5" />
                   <Skeleton className="h-3 w-1/3" />
@@ -270,7 +270,7 @@ export default function SectionsPage() {
                   deletingId === section.id && "opacity-0 scale-95 pointer-events-none"
                 )}
               >
-                <Card className="relative group h-full p-6 transition-all duration-150 ease-out hover:border-accent hover:shadow-card">
+                <Card className="relative group h-full p-4 md:p-6 transition-all duration-150 ease-out hover:border-accent hover:shadow-card">
                   {/* Clickable Card Link for Navigation */}
                   <Link
                     href={`/sections/${section.id}`}
@@ -279,7 +279,7 @@ export default function SectionsPage() {
                   />
 
                   <div className="relative z-10 flex items-start justify-between gap-3 pointer-events-none">
-                    <div className="space-y-1.5 text-start min-w-0 pr-2">
+                    <div className="space-y-1.5 text-start min-w-0 pe-2">
                       <h3 className="font-semibold text-base text-foreground tracking-tight group-hover:text-accent transition-colors duration-150 truncate">
                         {section.name}
                       </h3>
@@ -294,7 +294,7 @@ export default function SectionsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 text-muted hover:text-foreground hover:bg-surface-hover rounded-md focus-visible:ring-1"
+                            className="h-10 w-10 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 p-0 text-muted hover:text-foreground hover:bg-surface-hover rounded-md focus-visible:ring-1"
                             aria-label={t("optionsAria")}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -341,11 +341,11 @@ export default function SectionsPage() {
                 <Button
                   variant="primary"
                   onClick={() => setIsDialogOpen(true)}
-                  className="h-14 w-14 rounded-full p-0 shadow-soft transition-transform duration-150 hover:scale-[1.03] active:scale-95"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full p-0 shadow-soft transition-transform duration-150 hover:scale-[1.03] active:scale-95"
                   title={t("addSection")}
                   aria-label={t("addSection")}
                 >
-                  <Plus className="h-6 w-6 stroke-[2.5]" />
+                  <Plus className="h-6 w-6 sm:h-7 sm:w-7 stroke-[2.5]" />
                 </Button>
                 <span className="text-xs font-medium text-foreground">
                   {t("addSection")}
@@ -384,7 +384,7 @@ export default function SectionsPage() {
               )}
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="gap-2 sm:gap-0">
               <Button
                 type="button"
                 variant="outline"
@@ -395,6 +395,7 @@ export default function SectionsPage() {
                   setNameError(null);
                 }}
                 disabled={isSaving}
+                className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
               >
                 {tCommon("cancel")}
               </Button>
@@ -403,6 +404,7 @@ export default function SectionsPage() {
                 variant="primary"
                 size="sm"
                 isLoading={isSaving}
+                className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
               >
                 {tCommon("save")}
               </Button>

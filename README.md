@@ -34,3 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Environment Variables
+
+The application requires the following environment variables:
+
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL.
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous API key.
+- `NEXT_PUBLIC_APP_URL`: Base application URL used for generating scannable QR code links.
+  - **Local development**: `http://localhost:3000`
+  - **Production**: Must be set to your deployed domain (e.g. `https://inventory-app.mahmoudbahaa2021.workers.dev`).
+

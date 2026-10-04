@@ -11,9 +11,11 @@ import { cn } from "@/lib/utils";
 export function LocaleSwitcher({
   currentLocale,
   className,
+  showFullOnMobile = false,
 }: {
   currentLocale: string;
   className?: string;
+  showFullOnMobile?: boolean;
 }) {
   const t = useTranslations("common");
   const router = useRouter();
@@ -31,12 +33,19 @@ export function LocaleSwitcher({
       variant="outline"
       size="sm"
       onClick={toggleLocale}
-      className={cn("gap-2", className)}
+      className={cn("gap-1.5 sm:gap-2 px-2.5 sm:px-3 min-h-[44px] sm:min-h-8", className)}
       aria-label={t("switchLanguage")}
       title={t("switchLanguage")}
     >
-      <Languages className="h-3.5 w-3.5 text-accent" />
-      <span>{currentLocale === "ar" ? "English" : "العربية"}</span>
+      <Languages className="h-3.5 w-3.5 text-accent shrink-0" />
+      {showFullOnMobile ? (
+        <span>{currentLocale === "ar" ? "English" : "العربية"}</span>
+      ) : (
+        <>
+          <span className="hidden sm:inline">{currentLocale === "ar" ? "English" : "العربية"}</span>
+          <span className="inline sm:hidden font-semibold text-xs">{currentLocale === "ar" ? "EN" : "ع"}</span>
+        </>
+      )}
     </Button>
   );
 }

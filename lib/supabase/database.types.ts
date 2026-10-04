@@ -80,6 +80,7 @@ export type Database = {
           photo_url: string | null;
           has_qr: boolean;
           qr_data: string | null;
+          share_token: string | null;
           created_at: string;
         };
         Insert: {
@@ -91,6 +92,7 @@ export type Database = {
           photo_url?: string | null;
           has_qr?: boolean;
           qr_data?: string | null;
+          share_token?: string | null;
           created_at?: string;
         };
         Update: {
@@ -102,6 +104,7 @@ export type Database = {
           photo_url?: string | null;
           has_qr?: boolean;
           qr_data?: string | null;
+          share_token?: string | null;
           created_at?: string;
         };
         Relationships: [

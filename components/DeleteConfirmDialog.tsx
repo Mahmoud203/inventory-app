@@ -66,6 +66,7 @@ export function DeleteConfirmDialog({
             size="sm"
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
           >
             {tCommon("cancel")}
           </Button>
@@ -75,6 +76,7 @@ export function DeleteConfirmDialog({
             size="sm"
             onClick={onConfirm}
             isLoading={isDeleting}
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
           >
             {confirmLabel}
           </Button>

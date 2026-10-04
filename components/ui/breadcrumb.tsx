@@ -18,7 +18,7 @@ const BreadcrumbList = React.forwardRef<
   <ol
     ref={ref}
     className={cn(
-      "flex flex-wrap items-center gap-1.5 break-words text-xs text-muted",
+      "flex flex-wrap items-center gap-1.5 text-xs text-muted min-w-0 max-w-full",
       className
     )}
     {...props}
@@ -32,7 +32,7 @@ const BreadcrumbItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <li
     ref={ref}
-    className={cn("inline-flex items-center gap-1.5", className)}
+    className={cn("inline-flex items-center gap-1.5 min-w-0 max-w-full shrink", className)}
     {...props}
   />
 ));
@@ -49,7 +49,7 @@ const BreadcrumbLink = React.forwardRef<
     <Comp
       ref={ref}
       className={cn(
-        "transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xs",
+        "transition-colors duration-150 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xs truncate max-w-[110px] sm:max-w-[200px] md:max-w-none inline-block align-bottom",
         className
       )}
       {...props}
@@ -67,7 +67,7 @@ const BreadcrumbPage = React.forwardRef<
     role="link"
     aria-disabled="true"
     aria-current="page"
-    className={cn("font-medium text-foreground", className)}
+    className={cn("font-medium text-foreground truncate max-w-[130px] sm:max-w-[240px] md:max-w-none inline-block align-bottom", className)}
     {...props}
   />
 ));

@@ -157,8 +157,25 @@
     "downloadQr": "تحميل رمز QR",
     "qrHeading": "معرّف QR قابل للمسح",
     "qrSubtitle": "امسح الرمز ضوئياً عبر قارئ الباركود أو كاميرا الجوال",
+    "qrCaption": "المسح يفتح صفحة المنتج العامة",
+    "copyLink": "نسخ الرابط",
+    "linkCopied": "تم نسخ الرابط",
+    "regenerateLink": "إعادة إنشاء الرابط",
+    "regenerateConfirmTitle": "إعادة إنشاء رابط QR؟",
+    "regenerateConfirmDescription": "إعادة إنشاء الرابط ستؤدي إلى توقف رمز QR القديم عن العمل. هل تريد المتابعة؟",
+    "regenerateConfirmAction": "إعادة إنشاء",
+    "regenerating": "جاري إعادة الإنشاء...",
+    "regenerateSuccess": "تمت إعادة إنشاء رابط QR بنجاح",
+    "regenerateError": "فشل إعادة إنشاء رابط QR. يرجى المحاولة مرة أخرى.",
     "noNotes": "لا توجد ملاحظات أو مواصفات مسجلة لهذا الصنف.",
     "addedOn": "تاريخ الإضافة"
+  },
+  "publicProduct": {
+    "notFoundTitle": "رمز QR غير صالح",
+    "notFoundDescription": "رمز QR هذا غير صالح أو قد تمت إزالته.",
+    "noNotes": "لا توجد ملاحظات أو مواصفات مسجلة لهذا الصنف.",
+    "poweredBy": "مشغل بواسطة {appName}",
+    "signIn": "تسجيل الدخول"
   },
   "designSystem": {
     "badge": "نظام التصميم",

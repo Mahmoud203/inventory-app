@@ -157,8 +157,25 @@
     "downloadQr": "Download QR",
     "qrHeading": "Scannable QR Identifier",
     "qrSubtitle": "Scan using a handheld mobile device or terminal barcode reader",
+    "qrCaption": "Scans open the public product page",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied",
+    "regenerateLink": "Regenerate link",
+    "regenerateConfirmTitle": "Regenerate QR link?",
+    "regenerateConfirmDescription": "Regenerating will make the old QR code stop working. Continue?",
+    "regenerateConfirmAction": "Regenerate",
+    "regenerating": "Regenerating...",
+    "regenerateSuccess": "QR link regenerated successfully",
+    "regenerateError": "Failed to regenerate QR link. Please try again.",
     "noNotes": "No notes or specifications recorded for this SKU.",
     "addedOn": "Added on"
+  },
+  "publicProduct": {
+    "notFoundTitle": "Invalid QR Code",
+    "notFoundDescription": "This QR code is invalid or has been removed.",
+    "noNotes": "No notes or specifications recorded for this SKU.",
+    "poweredBy": "Powered by {appName}",
+    "signIn": "Sign In"
   },
   "designSystem": {
     "badge": "Design System",

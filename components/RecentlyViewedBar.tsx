@@ -148,14 +148,14 @@ export function RecentlyViewedBar() {
 
   return (
     <aside
-      className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface/85 backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.04)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.25)] transition-all duration-200 animate-in fade-in-50 slide-in-from-bottom-2"
+      className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-surface/85 backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.04)] dark:shadow-[0_-4px_16px_rgba(0,0,0,0.25)] transition-all duration-200 animate-in fade-in-50 slide-in-from-bottom-2 hide-on-short-screen"
       style={{
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
       aria-label={t("title")}
     >
-      <div className="mx-auto w-full max-w-[1200px] px-3 py-2 sm:px-6">
-        <div className="flex items-center gap-3">
+      <div className="mx-auto w-full max-w-[1200px] px-3 sm:px-6 h-16 md:h-[72px] flex items-center">
+        <div className="flex items-center gap-2 sm:gap-3 w-full">
           {/* Label indicator (desktop/tablet) */}
           <div className="hidden sm:flex items-center gap-2 shrink-0 pe-3 border-e border-border/60 select-none">
             <Clock className="h-4 w-4 text-muted" aria-hidden="true" />
@@ -165,7 +165,7 @@ export function RecentlyViewedBar() {
           </div>
 
           {/* Compact Clock Icon on mobile */}
-          <div className="flex sm:hidden items-center shrink-0 ps-1 text-muted" title={t("title")}>
+          <div className="flex sm:hidden items-center shrink-0 ps-1 text-muted min-h-[44px] min-w-[28px] justify-center" title={t("title")}>
             <Clock className="h-4 w-4" aria-hidden="true" />
           </div>
 
@@ -193,7 +193,7 @@ export function RecentlyViewedBar() {
             <div
               ref={scrollContainerRef}
               onScroll={updateScrollState}
-              className="flex items-center gap-2.5 overflow-x-auto scroll-smooth snap-x snap-mandatory py-1 px-1 no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-none"
+              className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto scroll-smooth snap-x snap-mandatory py-1 px-1 no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden focus-visible:outline-none"
               tabIndex={0}
               role="region"
               aria-label={t("title")}
@@ -202,11 +202,11 @@ export function RecentlyViewedBar() {
                 <Link
                   key={item.id}
                   href={`/product/${item.product.id}`}
-                  className="group shrink-0 snap-start flex items-center gap-2.5 p-1 pe-3 rounded-xl border border-border/70 bg-bg/50 hover:bg-surface hover:border-accent/40 hover:-translate-y-0.5 hover:ring-2 hover:ring-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-none hover:shadow-card transition-all duration-150 ease-out"
+                  className="group shrink-0 snap-start flex items-center gap-2 sm:gap-2.5 p-1 pe-2.5 sm:pe-3 rounded-xl border border-border/70 bg-bg/50 hover:bg-surface hover:border-accent/40 hover:-translate-y-0.5 hover:ring-2 hover:ring-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent shadow-none hover:shadow-card transition-all duration-150 ease-out min-h-[44px]"
                   title={t("viewProduct", { name: item.product.name })}
                 >
-                  {/* Thumbnail (56x56, rounded-lg) */}
-                  <div className="relative h-14 w-14 min-w-[56px] min-h-[56px] rounded-lg overflow-hidden border border-border/60 bg-secondary/30 flex items-center justify-center shrink-0 group-hover:ring-2 group-hover:ring-accent/30 transition-all duration-150">
+                  {/* Thumbnail (44x44 mobile, 48x48 sm, 56x56 desktop) */}
+                  <div className="relative h-11 w-11 min-w-[44px] min-h-[44px] sm:h-12 sm:w-12 sm:min-w-[48px] sm:min-h-[48px] md:h-14 md:w-14 md:min-w-[56px] md:min-h-[56px] rounded-lg overflow-hidden border border-border/60 bg-secondary/30 flex items-center justify-center shrink-0 group-hover:ring-2 group-hover:ring-accent/30 transition-all duration-150">
                     {item.product.photo_url ? (
                       <img
                         src={item.product.photo_url}
@@ -216,14 +216,14 @@ export function RecentlyViewedBar() {
                       />
                     ) : (
                       <div className="flex flex-col items-center justify-center text-muted/50">
-                        <ImageIcon className="h-6 w-6 stroke-[1.5]" />
+                        <ImageIcon className="h-5 w-5 sm:h-6 sm:w-6 stroke-[1.5]" />
                         <span className="sr-only">{t("noImage")}</span>
                       </div>
                     )}
                   </div>
 
                   {/* Name (single line, truncated) */}
-                  <div className="flex flex-col min-w-0 max-w-[120px] sm:max-w-[150px] text-start">
+                  <div className="flex flex-col min-w-0 max-w-[100px] sm:max-w-[150px] text-start">
                     <span className="text-xs sm:text-sm font-medium text-foreground truncate group-hover:text-accent transition-colors duration-150">
                       {item.product.name}
                     </span>

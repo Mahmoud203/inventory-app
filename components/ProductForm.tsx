@@ -33,6 +33,7 @@ export interface InitialProductData {
   photo_url: string | null;
   has_qr: boolean;
   qr_data: string | null;
+  share_token?: string | null;
 }
 
 interface ProductFormProps {
@@ -221,15 +222,20 @@ export function ProductForm({
 
       setUploadProgress(95);
 
+      const origin =
+        process.env.NEXT_PUBLIC_APP_URL ||
+        (typeof window !== "undefined" ? window.location.origin : "");
+      const cleanOrigin = origin.replace(/\/+$/, "");
+
       if (initialProduct) {
         // UPDATE existing product
-        const qrData = hasQr
-          ? JSON.stringify({
-            id: initialProduct.id,
-            name: name.trim(),
-            notes: notes.trim() || undefined,
-          })
-          : null;
+        let shareToken: string | null = null;
+        let qrData: string | null = null;
+
+        if (hasQr) {
+          shareToken = initialProduct.share_token || crypto.randomUUID();
+          qrData = `${cleanOrigin}/${locale}/p/${shareToken}`;
+        }
 
         const { error: updateError } = await supabase
           .from("products")
@@ -239,6 +245,7 @@ export function ProductForm({
             photo_url: finalPhotoUrl,
             has_qr: hasQr,
             qr_data: qrData,
+            share_token: shareToken,
           })
           .eq("id", initialProduct.id);
 
@@ -250,13 +257,8 @@ export function ProductForm({
       } else {
         // CREATE new product
         const productId = crypto.randomUUID();
-        const qrData = hasQr
-          ? JSON.stringify({
-            id: productId,
-            name: name.trim(),
-            notes: notes.trim() || undefined,
-          })
-          : null;
+        const shareToken = hasQr ? crypto.randomUUID() : null;
+        const qrData = hasQr ? `${cleanOrigin}/${locale}/p/${shareToken}` : null;
 
         const { error: insertError } = await supabase.from("products").insert({
           id: productId,
@@ -267,6 +269,7 @@ export function ProductForm({
           photo_url: finalPhotoUrl,
           has_qr: hasQr,
           qr_data: qrData,
+          share_token: shareToken,
         });
 
         if (insertError) {
@@ -453,13 +456,14 @@ export function ProductForm({
         </div>
 
         {/* 5. Footer Actions */}
-        <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-border/40">
+        <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 pt-4 border-t border-border/40">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handleCancelClick}
             disabled={isSaving}
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
           >
             {tCommon("cancel")}
           </Button>
@@ -468,7 +472,7 @@ export function ProductForm({
             variant="primary"
             size="sm"
             isLoading={isSaving}
-            className="font-medium"
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0 font-medium"
           >
             {initialProduct ? t("update") : t("save")}
           </Button>
@@ -495,6 +499,7 @@ export function ProductForm({
               variant="outline"
               size="sm"
               onClick={() => setShowDiscardConfirm(false)}
+              className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
             >
               {t("discardCancel")}
             </Button>
@@ -506,6 +511,7 @@ export function ProductForm({
                 setShowDiscardConfirm(false);
                 onCancel();
               }}
+              className="w-full sm:w-auto min-h-[44px] sm:min-h-0"
             >
               {t("discardConfirm")}
             </Button>

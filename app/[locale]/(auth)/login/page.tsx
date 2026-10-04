@@ -170,14 +170,14 @@ export default function LoginPage() {
 
   return (
     <div
-      className="relative min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-cover bg-center bg-no-repeat bg-fixed selection:bg-accent/15 selection:text-accent"
+      className="relative min-h-screen min-h-[100dvh] w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-cover bg-center bg-no-repeat bg-fixed selection:bg-accent/15 selection:text-accent"
       style={{
         backgroundImage: "url('/login-bg.jpg')",
       }}
     >
       {/* Floating Language Toggle Pill (Top-Right in LTR, Top-Left in RTL) */}
       <div
-        className="login-glass absolute top-4 end-4 sm:top-6 sm:end-6 z-20 flex items-center p-1 shadow-[0_8px_32px_rgba(0,0,0,0.15)]"
+        className="login-glass absolute top-4 end-4 sm:top-6 sm:end-6 z-20 flex items-center h-9 md:h-10 px-1 shadow-[0_8px_32px_rgba(0,0,0,0.15)]"
         style={{
           background: "rgba(255, 255, 255, 0.12)",
           backdropFilter: "blur(16px) saturate(120%)",
@@ -188,13 +188,14 @@ export default function LoginPage() {
       >
         <LocaleSwitcher
           currentLocale={locale}
-          className="border-transparent bg-transparent text-white hover:bg-white/10 hover:text-white [&_svg]:text-white"
+          showFullOnMobile
+          className="border-transparent bg-transparent text-white hover:bg-white/10 hover:text-white [&_svg]:text-white h-full"
         />
       </div>
 
       {/* Main Centered Frosted Glass Container */}
       <div
-        className="login-glass relative z-10 w-full max-w-md p-6 sm:p-8 animate-in fade-in-50 zoom-in-95 duration-200"
+        className="login-glass relative z-10 w-full max-w-md mx-4 p-6 md:p-10 animate-in fade-in-50 zoom-in-95 duration-200"
         style={{
           background: "rgba(255, 255, 255, 0.12)",
           backdropFilter: "blur(16px) saturate(120%)",
